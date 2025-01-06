@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Pokemon-Style Continuous Tile-Based Movement</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #000;
+        }
+
+        #viewport {
+            position: relative;
+            overflow: hidden;
+            margin: 100px auto;
+            border: 2px solid #999999;
+            width: 640px;
+            height: 480px;
+        }
+
+        #gameCanvas {
+            display: block;
+            background-color: #000000;
+            position: absolute;
+            /* transition: transform 0.4s ease; */
+            top: 0;
+            left: 0;
+        }
+
+        #dialogue {
+            position: absolute;
+            transition: transform 0.4s ease;
+            bottom: -80px;
+            left: 20px;
+            width: 600px;
+            height: 80px;
+            z-index: 2;
+        }
+
+        .box {
+            font-family: monospace;
+            border-radius: 8px;
+            border: 2px solid #505050;
+            background-color: #c5c5c5;
+            font-size: 16px;
+            line-height:24px;
+            padding: 15px 20px;
+            box-sizing: border-box;
+            display: block;
+        }
+
+        #dialogue.ready::after {
+            content: "Press \"E\" to continue";
+            position: absolute;
+            bottom: 5px;
+            right: 20px;
+            font-size: 12px;
+            color: #505050;
+        }
+
+        #dialogue.active {
+            transform: translateY(-100px);
+        }
+
+        /* Container around our battle interface */
+        #battle-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 640px;
+            height: 480px;
+            background-color: #fff;
+            display: none;
+            transition: opacity 2s ease;
+        }
+        #battle-container.show {
+            display: block;
+        }
+
+        /* Optional background overlay (could also be a background image) */
+        .battle-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(#eee, #ccc);
+            z-index: 0;
+        }
+
+        /* The canvas sits above the background */
+        #battleCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
+            /* pointer-events: none; if you don't want to capture clicks on the canvas */
+        }
+
+        /* Enemy status in top-left */
+        .enemy-status {
+            position: absolute;
+            top: 40px;
+            left: 40px;
+            width: 200px;
+            height: 60px;
+            padding: 5px;
+            background: #eee;
+            z-index: 2;
+        }
+
+        #enemy-name-level {
+            font-size: 16px;
+            margin-bottom: 5px;
+            height: 24px;
+        }
+
+        .enemy-hp-bar {
+            width: 100%;
+            height: 10px;
+            background: #555;
+            position: relative;
+        }
+
+        #enemy-hp-fill {
+            height: 100%;
+            background: #0f0;
+            transition: all 1s;
+        }
+
+        /* Player status in bottom-right */
+        .player-status {
+            position: absolute;
+            right: 40px;
+            bottom: 110px;
+            width: 220px;
+            height: 80px;
+            padding: 5px;
+            background: #eee;
+            z-index: 2;
+        }
+
+        #player-name-level {
+            font-size: 16px;
+            margin-bottom: 3px;
+            height: 24px;
+        }
+
+        .player-hp-bar {
+            width: 100%;
+            height: 10px;
+            background: #555;
+            margin-bottom: 5px;
+            position: relative;
+        }
+
+        #player-hp-fill {
+            height: 100%;
+            background: #0f0;
+            transition: all 1s;
+        }
+
+        #player-hp-text {
+            font-size: 14px;
+        }
+
+        /* Message box at bottom */
+        #message-box {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            height: 80px;
+            background: #eee;
+            z-index: 0;
+        }
+
+        #enemy-pokemon-sprite {
+            position: absolute;
+            background-size: 200% 200%;
+            top: 70px;
+            right: 100px;
+            width: 96px;
+            height: 96px;
+            z-index: 1;
+        }
+
+        @keyframes enemy-attacking {
+            0% {
+                transform: translate(0px, 0px);
+            }
+            50% {
+                transform: translate(-250px, 150px);
+            }
+            100% {
+                transform: translate(0px, 0px);
+            }
+        }
+
+        @keyframes player-attacking {
+            0% {
+                transform: translate(0px, 0px);
+            }
+            50% {
+                transform: translate(250px, -150px);
+            }
+            100% {
+                transform: translate(0px, 0px);
+            }
+        }
+
+        #enemy-pokemon-sprite.attacking {
+            animation: enemy-attacking 0.3s ease-in-out forwards;
+        }
+
+        #player-pokemon-sprite.attacking {
+            animation: player-attacking 0.3s ease-in-out forwards;
+        }
+
+        #player-pokemon-sprite {
+            position: absolute;
+            background-size: 200% 200%;
+            bottom: 100px;
+            left: 100px;
+            width: 96px;
+            height: 96px;
+            z-index: 1;
+        }
+
+        #attack-menu {
+            position: absolute;
+            right: 20px;
+            bottom: 100px;
+            width: 200px;
+            height: 120px;
+            padding: 10px 5px;
+            background: #eee;
+            display: none;
+            z-index: 3;
+        }
+
+        #attack-menu.show {
+            display: block;
+        }
+
+        #attack-menu>div {
+            padding: 0 10px;
+        }
+
+        #attack-menu>div.selected {
+            background: #999;
+        }
+    </style>
+</head>
+<body>
+<div id="viewport">
+    <canvas id="gameCanvas" width="3200" height="3200"></canvas>
+    <div id="battle-container">
+
+        <!-- Optional background layer -->
+        <div class="battle-background"></div>
+
+        <!-- Canvas for dynamic sprites (Pokémon) -->
+        <canvas id="battleCanvas" width="640" height="480"></canvas>
+
+        <!-- Enemy status box (top-left) -->
+        <div class="enemy-status box">
+            <div id="enemy-name-level"></div>
+            <div class="enemy-hp-bar">
+                <div id="enemy-hp-fill" style="width: 100%"></div>
+            </div>
+        </div>
+
+        <!-- Player status box (bottom-right) -->
+        <div class="player-status box">
+            <div id="player-name-level"></div>
+            <div class="player-hp-bar">
+                <div id="player-hp-fill" style="width: 100%"></div>
+            </div>
+            <div id="player-hp-text">HP: 28/30</div>
+        </div>
+
+        <div id="enemy-pokemon-sprite"></div>
+
+        <div id="player-pokemon-sprite"></div>
+
+        <div id="attack-menu" class="box">
+            <div id="attack-0" class="selected">--</div>
+            <div id="attack-1">--</div>
+            <div id="attack-2">--</div>
+            <div id="attack-3">--</div>
+        </div>
+
+        <!-- Message box at the bottom -->
+        <div id="message-box" class="box">
+            A wild Rattata appeared!
+        </div>
+
+    </div>
+    <div id="dialogue" class="box"></div>
+</div>
+<script type="module" src="src/main.js"></script>
+</body>
+</html>
