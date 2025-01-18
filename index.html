@@ -19,11 +19,10 @@
             height: 480px;
         }
 
-        #gameCanvas {
+        .layer {
             display: block;
-            background-color: #000000;
+            background-color: transparent;
             position: absolute;
-            /* transition: transform 0.4s ease; */
             top: 0;
             left: 0;
         }
@@ -255,7 +254,9 @@
 </head>
 <body>
 <div id="viewport">
-    <canvas id="gameCanvas" width="3200" height="3200"></canvas>
+    <canvas id="background-canvas" class="layer" width="3200" height="3200"></canvas>
+    <canvas id="foreground-canvas" class="layer" width="3200" height="3200"></canvas>
+    <canvas id="3d-background-canvas" class="layer" width="3200" height="3200"></canvas>
     <div id="battle-container">
 
         <!-- Optional background layer -->

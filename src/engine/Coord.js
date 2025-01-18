@@ -43,6 +43,14 @@ export class Coord {
     toString() {
         return `Coord(${this.x}, ${this.y})`
     }
+
+    *traverse() {
+        for (let row = 0; row < this.y; row++) {
+            for (let col = 0; col < this.x; col++) {
+                yield new Coord(col, row);
+            }
+        }
+    }
 }
 
 export const CONSTS = {

@@ -1,5 +1,6 @@
 import { TILE_SIZE } from "../../constants.js";
 import { Coord, CONSTS } from "../Coord.js";
+import {Array2D} from "../utils.js";
 
 /**
  * Manages the dynamic creation of a map's collision data
@@ -22,24 +23,14 @@ export class MapManager {
     }
 
     generateCollisionMap() {
-        const collisionMap = [];
-        for (let row = 0; row < this.dimensions.y; row++) {
-            collisionMap[row] = [];
-            for (let col = 0; col < this.dimensions.x; col++) {
-                collisionMap[row][col] = false; // start as all walkable
-            }
-        }
+        const collisionMap = new Array2D(false);
 
         this.entities.forEach((entity) => {
             const matrix = entity.getCollisionMatrix();
-            for (let row = 0; row < entity.dimensions.y; row++) {
-                for (let col = 0; col < entity.dimensions.x; col++) {
-                    const global = new Coord(entity.tile.x + col, entity.tile.y + row);
-                    if (global.isInBound(CONSTS.ZERO, new Coord(this.dimensions.x, this.dimensions.y))) {
-                        if (matrix[row][col] === false || matrix[row][col] === true) {
-                            collisionMap[global.y][global.x] = matrix[row][col];
-                        }
-                    }
+            for (const coord of entity.dimensions.traverse()) {
+                const global = entity.tile.add(coord);
+                if (global.isInBound(CONSTS.ZERO, this.dimensions)) {
+                    collisionMap.set(global, matrix[coord.y][coord.x]);
                 }
             }
         });
@@ -52,30 +43,15 @@ export class MapManager {
      * If multiple entities overlap, we can pick the maximum.
      */
     generateSpeedFactorMap() {
-        const speedMap = [];
-        // Initialize everything to 1.0 (normal speed)
-        for (let y = 0; y < this.dimensions.y; y++) {
-            speedMap[y] = [];
-            for (let x = 0; x < this.dimensions.x; x++) {
-                speedMap[y][x] = 1.0;
-            }
-        }
+        const speedMap = new Array2D(1.0);
 
-        // For each entity, see if it defines a custom speed factor
         this.entities.forEach(entity => {
-            // If an entity DOESN’T define speedFactor, skip
             const entitySpeed = entity.speedFactor || 1.0;
-
-            // For each tile of the entity’s footprint
-            for (let row = 0; row < entity.dimensions.y; row++) {
-                for (let col = 0; col < entity.dimensions.x; col++) {
-                    const global = new Coord(entity.tile.x + col, entity.tile.y + row);
-
-                    if (global.isInBound(CONSTS.ZERO, new Coord(this.dimensions.x, this.dimensions.y))) {
-                        // We pick the max factor (so tall grass overrides short grass, etc.)
-                        if (entitySpeed > speedMap[global.y][global.x]) {
-                            speedMap[global.y][global.x] = entitySpeed;
-                        }
+            for (const coord of entity.dimensions.traverse()) {
+                const global = entity.tile.add(coord);
+                if (global.isInBound(CONSTS.ZERO, this.dimensions)) {
+                    if (entitySpeed > speedMap.get(global)) {
+                        speedMap.set(global, entitySpeed);
                     }
                 }
             }
@@ -89,16 +65,11 @@ export class MapManager {
      * which portal (if any) exists at a given tile coordinate.
      */
     generatePortalMap() {
-        // A 2D array or a dictionary keyed by "row_col"
-        const portalLookup = {};
+        const portalLookup = new Array2D();
 
         this.entities.forEach((entity) => {
-            // We'll check if it's a portal by checking if it has the relevant properties
-            // or by instanceOf check (PortalEntity, DoorEntity, etc.)
             if (entity.destinationZoneKey !== undefined) {
-                // Then it's some kind of portal. We assume single-tile for simplicity:
-                const key = `${entity.tile.y}_${entity.tile.x}`;
-                portalLookup[key] = entity;
+                portalLookup.set(entity.tile, entity);
             }
         });
 
@@ -106,16 +77,11 @@ export class MapManager {
     }
 
     generateInteractableMap() {
-        // A 2D array or a dictionary keyed by "row_col"
-        const interactableLookup = {};
+        const interactableLookup = new Array2D();
 
         this.entities.forEach((entity) => {
-            // We'll check if it's a portal by checking if it has the relevant properties
-            // or by instanceOf check (PortalEntity, DoorEntity, etc.)
             if (entity.isInteractable) {
-                // Then it's some kind of portal. We assume single-tile for simplicity:
-                const key = `${entity.tile.y}_${entity.tile.x}`;
-                interactableLookup[key] = entity;
+                interactableLookup.set(entity.tile, entity);
             }
         });
 
@@ -123,16 +89,12 @@ export class MapManager {
     }
 
     generateOnWalkMap() {
-        // A 2D array or a dictionary keyed by "row_col"
-        const onWalkMap = {};
+        const onWalkMap = new Array2D();
 
         this.entities.forEach((entity) => {
             if (entity.hasOnWalk) {
-                for (let row = 0; row < entity.dimensions.y; row++) {
-                    for (let col = 0; col < entity.dimensions.x; col++) {
-                        const key = `${entity.tile.y + row}_${entity.tile.x + col}`;
-                        onWalkMap[key] = entity;
-                    }
+                for (const tile of entity.dimensions.traverse()) {
+                    onWalkMap.set(tile, entity);
                 }
             }
         });
@@ -150,30 +112,26 @@ export class MapManager {
     }
 
     isBlocked(tile) {
-        return this.collisionMap[tile.y][tile.x] === true;
+        return this.collisionMap.get(tile) === true;
     }
 
     isInteractable(tile) {
-        const key = `${tile.y}_${tile.x}`;
-        return !!this.interactableMap[key];
+        return !!this.interactableMap.get(tile);
     }
 
     getInteractableAt(tile) {
-        const key = `${tile.y}_${tile.x}`;
-        return this.interactableMap[key];
+        return this.interactableMap.get(tile);
     }
 
     getOnWalkedAt(tile) {
-        const key = `${tile.y}_${tile.x}`;
-        return this.onWalkMap[key];
+        return this.onWalkMap.get(tile);
     }
 
     /**
      * Returns the portal entity at the given tile (if any), otherwise undefined.
      */
     getPortalAt(tile) {
-        const key = `${tile.y}_${tile.x}`;
-        return this.portalMap[key];
+        return this.portalMap.get(tile);
     }
 
     /**
@@ -181,17 +139,16 @@ export class MapManager {
      * e.g., 1.0 => normal, 1.5 => slower, etc.
      */
     getSpeedFactor(coord) {
-        return this.speedFactorMap[coord.y][coord.x];
+        return this.speedFactorMap.get(coord);
     }
 
     draw(ctx) {
         // 1) Draw simple green background
-        for (let row = 0; row < this.dimensions.y; row++) {
-            for (let col = 0; col < this.dimensions.x; col++) {
-                ctx.fillStyle = "#000000";
-                ctx.fillRect(col * TILE_SIZE, row * TILE_SIZE, TILE_SIZE, TILE_SIZE);
-            }
+        for (const coord of this.dimensions.traverse()) {
+            ctx.fillStyle = "#000000";
+            ctx.fillRect(coord.x * TILE_SIZE, coord.y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
         }
+
         // 2) Draw all entities
         this.entities.forEach((entity) => {
             entity.draw(ctx, TILE_SIZE);

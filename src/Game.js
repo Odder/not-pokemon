@@ -6,7 +6,7 @@ import {BattleScene} from "./scenes/BattleScene.js";
 
 
 export const scenes = {
-    'world': new World('gameCanvas', palletTownZone, {}),
+    'world': new World('foreground-canvas', palletTownZone, {}),
     'battleScene': new BattleScene(),
 }
 
