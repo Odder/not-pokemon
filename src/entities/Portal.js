@@ -6,10 +6,9 @@ export class Portal extends Entity {
         tile,
         destinationZoneKey,
         destinationSpawn,
-        colour = "#FF00FF",
         blocked = false
     ) {
-        super(tile, CONSTS.ONE, colour);
+        super(tile, CONSTS.ONE);
         this.destinationZoneKey = destinationZoneKey;
         this.destinationSpawn = destinationSpawn;
         this.blocked = blocked;
@@ -17,11 +16,5 @@ export class Portal extends Entity {
 
     getCollisionMatrix() {
         return [[this.blocked]];
-    }
-
-    draw(ctx, tileSize) {
-        if (this.colour) {
-            super.draw(ctx, tileSize);
-        }
     }
 }

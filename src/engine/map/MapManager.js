@@ -1,6 +1,7 @@
 import { TILE_SIZE } from "../../constants.js";
 import { Coord, CONSTS } from "../Coord.js";
 import {Array2D} from "../utils.js";
+import {ctx} from "../Canvas.js";
 
 /**
  * Manages the dynamic creation of a map's collision data
@@ -142,16 +143,21 @@ export class MapManager {
         return this.speedFactorMap.get(coord);
     }
 
-    draw(ctx) {
-        // 1) Draw simple green background
+    drawForeground() {
+        this.entities.forEach((entity) => {
+            entity.drawForeground();
+        });
+    }
+
+    drawBackground() {
         for (const coord of this.dimensions.traverse()) {
-            ctx.fillStyle = "#000000";
-            ctx.fillRect(coord.x * TILE_SIZE, coord.y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+            ctx.background.fillStyle = "#000000";
+            ctx.background.fillRect(coord.x * TILE_SIZE, coord.y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
         }
 
-        // 2) Draw all entities
         this.entities.forEach((entity) => {
-            entity.draw(ctx, TILE_SIZE);
+            entity.drawBackground();
+            entity.drawBackground3D();
         });
     }
 }

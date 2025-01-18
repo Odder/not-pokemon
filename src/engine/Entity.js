@@ -1,12 +1,13 @@
+import {ctx} from "./Canvas.js";
+
 /**
  * Base class for any object/structure placed on the map.
  * It knows its top-left tile position, width, and height in tiles.
  */
 export class Entity {
-    constructor(tile, dimensions, colour = "#888") {
+    constructor(tile, dimensions) {
         this.tile = tile;
         this.dimensions = dimensions;
-        this.colour = colour;
         this.speedFactor = 1;
         this.isInteractable = false;
         this.hasOnWalk = false;
@@ -35,14 +36,13 @@ export class Entity {
      * By default, we might fill a rectangle of the entity's footprint with `this.colour`.
      * Subclasses can override if they want more custom tile-by-tile drawing.
      */
-    draw(ctx, tileSize) {
-        ctx.fillStyle = this.colour;
-        ctx.fillRect(
-            this.tile.x * tileSize,
-            this.tile.y * tileSize,
-            this.dimensions.x * tileSize,
-            this.dimensions.y * tileSize
-        );
+    drawForeground() {
+    }
+
+    drawBackground() {
+    }
+
+    drawBackground3D() {
     }
 
     getEntities() {

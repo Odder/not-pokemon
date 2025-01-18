@@ -1,6 +1,8 @@
 import { Entity } from "../engine/Entity.js";
 import {Coord} from "../engine/Coord.js";
 import {worldSpriteSheet} from "../sprites.js";
+import {TILE_SIZE} from "../constants.js";
+import {ctx} from "../engine/Canvas.js";
 
 /**
  * Represents a wall entity in the game world. This class extends the functionality of the base Entity class and is used to create wall objects with specified dimensions and color.
@@ -18,9 +20,8 @@ export class Wall extends Entity {
         tile,
         dimensions,
         segments = [],
-        colour = "#66350b",
     ) {
-        super(tile, dimensions, colour);
+        super(tile, dimensions);
         this.segments = segments;
         this.lastTile = tile;
     }
@@ -41,11 +42,11 @@ export class Wall extends Entity {
         return [...this.segments]
     }
 
-    draw(ctx, tileSize) {
-        ctx.fillStyle = this.colour;
-        ctx.beginPath();
-        ctx.roundRect(this.tile.x * tileSize, this.tile.y * tileSize, this.dimensions.x * tileSize, this.dimensions.y * tileSize, 20);
-        ctx.fill();
+    drawBackground() {
+        ctx.background.fillStyle = 'brown';
+        ctx.background.beginPath();
+        ctx.background.roundRect(this.tile.x * TILE_SIZE, this.tile.y * TILE_SIZE, this.dimensions.x * TILE_SIZE, this.dimensions.y * TILE_SIZE, 20);
+        ctx.background.fill();
     }
 }
 
@@ -62,10 +63,10 @@ export class BoulderWall extends Wall {
         return this;
     }
 
-    draw(ctx, tileSize) {
+    drawBackground() {
         for (let row = 0; row < this.dimensions.y; row++) {
             for (let col = 0; col < this.dimensions.x; col++) {
-                worldSpriteSheet.draw(ctx, (this.tile.x + col) * tileSize, (this.tile.y + row) * tileSize, 3, 0);
+                worldSpriteSheet.draw(ctx.background, (this.tile.x + col) * TILE_SIZE, (this.tile.y + row) * TILE_SIZE, 3, 0);
             }
         }
     }

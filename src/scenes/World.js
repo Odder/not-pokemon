@@ -3,15 +3,16 @@ import {Player} from "../Player.js";
 import {TwoDTileCameraSoftFollow, TwoDTileWorld} from "../engine/scenes/TwoDTileWorld.js";
 import {zones} from "../zones.js";
 import {dialogue} from "../huds/Dialogue.js";
+import {canvas} from "../engine/Canvas.js";
 
 
 export class World extends TwoDTileWorld {
-    constructor(canvas, currentMap) {
+    constructor(currentMap) {
         const player = new Player(new Coord(0, 0));
-        super(canvas, {
+        super({
             player,
             currentMap,
-            camera: new TwoDTileCameraSoftFollow(canvas, player, {canvasDimensions: new Coord(20, 15)})
+            camera: new TwoDTileCameraSoftFollow(player, {canvasDimensions: new Coord(20, 15)})
         });
     }
 
@@ -47,11 +48,16 @@ export class World extends TwoDTileWorld {
     }
 
     loadZone(zoneKey, spawn) {
-        this.canvas.style.transition = "none";
+        canvas.foreground.style.transition = "none";
+        canvas.background.style.transition = "none";
+        canvas.background3D.style.transition = "none";
         setTimeout(() => {
-            this.canvas.style.transition = "all 0.4s ease-in-out";
-        }, 200)
+            canvas.foreground.style.transition = "all 0.4s ease-in-out";
+            canvas.background.style.transition = "all 0.4s ease-in-out";
+            canvas.background3D.style.transition = "all 0.4s ease-in-out";
+        }, 100)
         this.currentMap = zones[zoneKey];
+        this.draw(true);
         this.player.snapToTile(spawn);
     }
 }

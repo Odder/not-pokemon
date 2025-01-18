@@ -1,15 +1,16 @@
 import { Entity } from "../engine/Entity.js";
-import {npcSpriteSheet, worldSpriteSheet} from "../sprites.js";
+import { worldSpriteSheet} from "../sprites.js";
 import {TILE_SIZE} from "../constants.js";
 import {eventBus} from "../EventBus.js";
 import {Bulbasaur, Charmander, Pidgey, Rattata, Squirtle} from "../engine/pokemons/Pokemon.js";
+import {ctx} from "../engine/Canvas.js";
 
 /**
  * Represents a rectangular patch of grass, non-blocking.
  */
 export class Grass extends Entity {
-    constructor(tile, dimensions, colour = "#66BB66") {
-        super(tile, dimensions, colour);
+    constructor(tile, dimensions) {
+        super(tile, dimensions);
         this.speedFactor = 1.5; // e.g. 1.5 => 50% slower
         this.hasOnWalk = true;
     }
@@ -28,12 +29,13 @@ export class Grass extends Entity {
         return matrix;
     }
 
-    draw(ctx) {
+    drawBackground() {
         for (let row = 0; row < this.dimensions.y; row++) {
             for (let col = 0; col < this.dimensions.x; col++) {
-                worldSpriteSheet.draw(ctx, (this.tile.x + col) * TILE_SIZE, (this.tile.y + row) * TILE_SIZE, 1, 5);
+                worldSpriteSheet.draw(ctx.background, (this.tile.x + col) * TILE_SIZE, (this.tile.y + row) * TILE_SIZE, 1, 5);
             }
         }
+        console.log('drawing grass')
     }
 
     onWalk() {

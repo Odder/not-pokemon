@@ -2,10 +2,11 @@ import {CONSTS, Coord} from "../Coord.js";
 import {TILE_SIZE} from "../../constants.js";
 import {Scene} from "./Scene.js";
 import {inputHandler} from "../../InputHandler.js";
+import {canvas, ctx} from "../Canvas.js";
 
 export class TwoDTileWorld extends Scene {
-    constructor(canvas, {
-        player = new TwoDTilePlayer(canvas.width, canvas.height),
+    constructor({
+        player = new TwoDTilePlayer(),
         currentMap = '',
         tick = 150,
         tileSize = 32,
@@ -15,8 +16,6 @@ export class TwoDTileWorld extends Scene {
         super();
         this.currentMap = currentMap;
         this.player = player;
-        this.canvas = document.getElementById(canvas);
-        this.ctx = this.canvas.getContext("2d");
         this.tick = tick;
         this.tileSize = tileSize;
         this.ts = 0;
@@ -27,10 +26,20 @@ export class TwoDTileWorld extends Scene {
 
         requestAnimationFrame((ts) => this.gameLoop(ts));
         setTimeout(
-            () =>
-                this.canvas.style.transition = "all 0.4s ease-in-out",
-            200
+            () => {
+                canvas.background.style.transition = "all 0.4s ease-in-out";
+                canvas.background3D.style.transition = "all 0.4s ease-in-out";
+                canvas.foreground.style.transition = "all 0.4s ease-in-out";
+
+            },
+            100
         );
+    }
+
+    start() {
+        super.start();
+        setTimeout(() =>
+            this.draw(true), 10);
     }
 
     pause() {
@@ -61,13 +70,21 @@ export class TwoDTileWorld extends Scene {
             this.continueMove();
         }
 
-        this.camera.update(this.canvas);
+        this.camera.update();
     }
 
-    draw() {
-        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        this.currentMap.mapManager.draw(this.ctx, this.camera);
-        this.player.draw(this.ctx, this.tick);
+    draw(force= false) {
+        if (force) {
+            ctx.background.clearRect(0, 0, canvas.background.width, canvas.background.height);
+            ctx.background3D.clearRect(0, 0, canvas.background3D.width, canvas.background3D.height);
+        }
+        ctx.foreground.clearRect(0, 0, canvas.foreground.width, canvas.foreground.height);
+
+        this.currentMap.mapManager.drawForeground(this.camera);
+        if (force) {
+            this.currentMap.mapManager.drawBackground(this.camera);
+        }
+        this.player.draw(this.tick);
     }
 
     tryMove(move, override = false) {
@@ -146,13 +163,13 @@ export class TwoDTilePlayer {
         this.spriteSheet = null;
     }
 
-    draw(ctx, tick) {
+    draw(tick) {
         const rowMap = {};
         rowMap[CONSTS.UP.toString()] = 2;
         rowMap[CONSTS.DOWN.toString()] = 0;
         rowMap[CONSTS.LEFT.toString()] = 1;
         rowMap[CONSTS.RIGHT.toString()] = 3;
-        this.spriteSheet.draw(ctx, this.pos.x, this.pos.y, rowMap[this.facing.toString()], this.isMoving ? (((tick/5)^0) % 4) + 1 : 0);
+        this.spriteSheet.draw(ctx.foreground, this.pos.x, this.pos.y, rowMap[this.facing.toString()], this.isMoving ? (((tick/5)^0) % 4) + 1 : 0);
     }
 
     // Optionally define a method to snap to a new tile
@@ -163,12 +180,11 @@ export class TwoDTilePlayer {
 }
 
 export class TwoDTileCameraSoftFollow {
-    constructor(canvas, player, {
+    constructor(player, {
         tileSize = 32,
         canvasDimensions = new Coord(20, 20),
         margin = 5,
     }) {
-        this.canvas = canvas;
         this.pos = new Coord(0, 0);
         this.player = player;
         this.canvasDimensions = canvasDimensions.scalar(tileSize);
@@ -176,7 +192,7 @@ export class TwoDTileCameraSoftFollow {
 
     }
 
-    update(canvas) {
+    update() {
         const playerPosOnScreen = this.player.pos.subtract(this.pos);
         if (!playerPosOnScreen.isInBoundX(this.margin, this.canvasDimensions.subtract(this.margin))) {
             this.pos.x = this.player.pos.x - 320;
@@ -185,6 +201,8 @@ export class TwoDTileCameraSoftFollow {
             this.pos.y = this.player.pos.y - 240;
         }
 
-        canvas.style.transform = `translate(${-this.pos.x}px, ${-this.pos.y}px)`;
+        canvas.foreground.style.transform = `translate(${-this.pos.x}px, ${-this.pos.y}px)`;
+        canvas.background.style.transform = `translate(${-this.pos.x}px, ${-this.pos.y}px)`;
+        canvas.background3D.style.transform = `translate(${-this.pos.x}px, ${-this.pos.y}px)`;
     }
 }

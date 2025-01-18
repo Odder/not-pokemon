@@ -3,6 +3,7 @@ import {CONSTS} from "../../engine/Coord.js";
 import {npcSpriteSheet, pokemonNpcSpriteSheet} from "../../sprites.js";
 import {TILE_SIZE} from "../../constants.js";
 import {dialogue} from "../../huds/Dialogue.js";
+import {ctx} from "../../engine/Canvas.js";
 
 /**
  * Represents a rectangular patch of grass, non-blocking.
@@ -13,8 +14,8 @@ export class Human extends Entity {
      * width, height: dimensions in tiles
      * colour: rendering colour
      */
-    constructor(tile, colour = "#304897") {
-        super(tile, CONSTS.ONE, colour);
+    constructor(tile) {
+        super(tile, CONSTS.ONE);
         this.speedFactor = 1.5; // e.g. 1.5 => 50% slower
         this.isInteractable = true;
     }
@@ -28,8 +29,8 @@ export class Human extends Entity {
 }
 
 export class Eevee extends Human {
-    draw(ctx) {
-        npcSpriteSheet.draw(ctx, this.tile.x * TILE_SIZE, this.tile.y * TILE_SIZE, 0, 0, 32, 32);
+    drawForeground() {
+        npcSpriteSheet.draw(ctx.foreground, this.tile.x * TILE_SIZE, this.tile.y * TILE_SIZE, 0, 0, 32, 32);
     }
 
     interact() {
@@ -41,8 +42,8 @@ export class Eevee extends Human {
 }
 
 export class ProfessorOak extends Human {
-    draw(ctx) {
-        npcSpriteSheet.draw(ctx, this.tile.x * TILE_SIZE, this.tile.y * TILE_SIZE, 0, 0, 32, 32);
+    drawForeground() {
+        npcSpriteSheet.draw(ctx.foreground, this.tile.x * TILE_SIZE, this.tile.y * TILE_SIZE, 0, 0, 32, 32);
     }
 
     interact() {
@@ -54,8 +55,8 @@ export class ProfessorOak extends Human {
 }
 
 export class Bulbasaur extends Human {
-    draw(ctx) {
-        pokemonNpcSpriteSheet.draw(ctx, this.tile.x * TILE_SIZE, this.tile.y * TILE_SIZE, 0, 0, 32, 32);
+    drawForeground() {
+        pokemonNpcSpriteSheet.draw(ctx.foreground, this.tile.x * TILE_SIZE, this.tile.y * TILE_SIZE, 0, 0, 32, 32);
     }
 
     interact() {
@@ -66,8 +67,8 @@ export class Bulbasaur extends Human {
 }
 
 export class Squirtle extends Human {
-    draw(ctx) {
-        pokemonNpcSpriteSheet.draw(ctx, this.tile.x * TILE_SIZE, this.tile.y * TILE_SIZE, 0, 3, 32, 32);
+    drawForeground() {
+        pokemonNpcSpriteSheet.draw(ctx.foreground, this.tile.x * TILE_SIZE, this.tile.y * TILE_SIZE, 0, 3, 32, 32);
     }
 
     interact() {
@@ -78,8 +79,8 @@ export class Squirtle extends Human {
 }
 
 export class Charmander extends Human {
-    draw(ctx) {
-        pokemonNpcSpriteSheet.draw(ctx, this.tile.x * TILE_SIZE, this.tile.y * TILE_SIZE, 0, 1, 32, 32);
+    drawForeground() {
+        pokemonNpcSpriteSheet.draw(ctx.foreground, this.tile.x * TILE_SIZE, this.tile.y * TILE_SIZE, 0, 1, 32, 32);
     }
 
     interact() {

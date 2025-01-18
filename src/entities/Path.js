@@ -1,10 +1,11 @@
 import { Entity } from "../engine/Entity.js";
 import {worldSpriteSheet} from "../sprites.js";
 import {TILE_SIZE} from "../constants.js";
+import {ctx} from "../engine/Canvas.js";
 
 export class Path extends Entity {
-    constructor(tile, dimensions, colour = "#876f65") {
-        super(tile, dimensions, colour);
+    constructor(tile, dimensions) {
+        super(tile, dimensions);
         this.speedFactor = 1; // e.g. 1.5 => 50% slower
     }
 
@@ -19,20 +20,20 @@ export class Path extends Entity {
         return matrix;
     }
 
-    draw(ctx) {
+    drawBackground() {
         for (let row = 0; row < this.dimensions.y; row++) {
             for (let col = 0; col < this.dimensions.x; col++) {
-                worldSpriteSheet.draw(ctx, (this.tile.x + col) * TILE_SIZE, (this.tile.y + row) * TILE_SIZE, 3, 6);
+                worldSpriteSheet.draw(ctx.background, (this.tile.x + col) * TILE_SIZE, (this.tile.y + row) * TILE_SIZE, 3, 6);
             }
         }
     }
 }
 
 export class WoodenFloor extends Path {
-    draw(ctx) {
+    drawBackground() {
         for (let row = 0; row < this.dimensions.y; row++) {
             for (let col = 0; col < this.dimensions.x; col++) {
-                worldSpriteSheet.draw(ctx, (this.tile.x + col) * TILE_SIZE, (this.tile.y + row) * TILE_SIZE, 111, 6);
+                worldSpriteSheet.draw(ctx.background, (this.tile.x + col) * TILE_SIZE, (this.tile.y + row) * TILE_SIZE, 111, 6);
             }
         }
     }

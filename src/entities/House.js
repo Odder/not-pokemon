@@ -4,6 +4,7 @@ import { Coord } from "../engine/Coord.js";
 import {worldSpriteSheet} from "../sprites.js";
 import {TILE_SIZE} from "../constants.js";
 import {Portal} from "./Portal.js";
+import {ctx} from "../engine/Canvas.js";
 
 /**
  * A House occupies a rectangular footprint in tiles (width × height).
@@ -19,7 +20,7 @@ export class House extends Entity {
         dimensions,
         doors,
     ) {
-        super(tile, dimensions, '#888');
+        super(tile, dimensions);
 
         this.doorOffsets = doors.map(door => door[0]);
 
@@ -57,10 +58,10 @@ export class House extends Entity {
         return [...this.doorPortals];
     }
 
-    draw(ctx, tileSize) {
+    drawBackground() {
         for (let row = 0; row < this.dimensions.y; row++) {
             for (let col = 0; col < this.dimensions.x; col++) {
-                worldSpriteSheet.draw(ctx, (this.tile.x + col) * TILE_SIZE, (this.tile.y + row) * TILE_SIZE, this.baseSpritePosition.y + row, this.baseSpritePosition.x + col);
+                worldSpriteSheet.draw(ctx.background, (this.tile.x + col) * TILE_SIZE, (this.tile.y + row) * TILE_SIZE, this.baseSpritePosition.y + row, this.baseSpritePosition.x + col);
             }
         }
     }
