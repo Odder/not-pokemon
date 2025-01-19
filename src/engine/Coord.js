@@ -40,6 +40,10 @@ export class Coord {
         return this.y >= min.y && this.y <= max.y;
     }
 
+    isEqual(other) {
+        return this.x === other.x && this.y === other.y;
+    }
+
     toString() {
         return `Coord(${this.x}, ${this.y})`
     }

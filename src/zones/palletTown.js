@@ -6,6 +6,8 @@ import {BoulderWall, Wall} from "../entities/Wall.js";
 import {Path} from "../entities/Path.js";
 import {LowGrass} from "../entities/LowGrass.js";
 import {Eevee, Human} from "../entities/humans/Human.js";
+import palletTownLayout from "./palletTown.layout.js";
+
 
 const walls = new BoulderWall(new Coord(7, 42), CONSTS.ZERO)
     .drawSegment(CONSTS.DOWN, 10)
@@ -42,6 +44,8 @@ const house2 = new SmallGreenHouse(
     new Coord(27, 5),
 );
 
+console.info('layout', palletTownLayout)
+
 export const palletTownZone = new Zone("Pellet Town",
     [
         new LowGrass(new Coord(0, 0), new Coord(30, 70)),
@@ -53,5 +57,6 @@ export const palletTownZone = new Zone("Pellet Town",
         new Grass(new Coord(8, 42), new Coord(4, 10), '#00FF00'),
         new Eevee(new Coord(10, 48)),
     ],
-    new Coord(5, 53), new Coord(100, 100)
+    new Coord(5, 53), new Coord(100, 100),
+    palletTownLayout
 );

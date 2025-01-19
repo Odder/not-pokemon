@@ -4,6 +4,7 @@ import {TILE_SIZE} from "../constants.js";
 import {eventBus} from "../EventBus.js";
 import {Bulbasaur, Charmander, Pidgey, Rattata, Squirtle} from "../engine/pokemons/Pokemon.js";
 import {ctx} from "../engine/Canvas.js";
+import {Array2D} from "../engine/utils.js";
 
 /**
  * Represents a rectangular patch of grass, non-blocking.
@@ -19,14 +20,7 @@ export class Grass extends Entity {
      * All false => no collision in any tile of this grass patch.
      */
     getCollisionMatrix() {
-        const matrix = [];
-        for (let row = 0; row < this.dimensions.y; row++) {
-            matrix[row] = [];
-            for (let col = 0; col < this.dimensions.x; col++) {
-                matrix[row][col] = false; // not blocked
-            }
-        }
-        return matrix;
+        return new Array2D();
     }
 
     drawBackground() {

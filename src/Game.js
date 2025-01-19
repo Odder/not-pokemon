@@ -14,7 +14,7 @@ export class Game {
     constructor() {
         this.activeScene = scenes.world;
         this.activeScene.start()
-        this.activeScene.player.snapToTile(new Coord(5, 53));
+        this.activeScene.player.snapToTile(palletTownZone.spawnTile);
 
         eventBus.register('dialogue.started', () => this.pauseScene());
         eventBus.register('dialogue.ended', () => this.unpauseScene());

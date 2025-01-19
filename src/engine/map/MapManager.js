@@ -27,11 +27,10 @@ export class MapManager {
         const collisionMap = new Array2D(false);
 
         this.entities.forEach((entity) => {
-            const matrix = entity.getCollisionMatrix();
-            for (const coord of entity.dimensions.traverse()) {
-                const global = entity.tile.add(coord);
-                if (global.isInBound(CONSTS.ZERO, this.dimensions)) {
-                    collisionMap.set(global, matrix[coord.y][coord.x]);
+            for (const [coord, value] of entity.getCollisionMatrix().traverse()) {
+                const globalCoord = entity.tile.add(coord);
+                if (globalCoord.isInBound(CONSTS.ZERO, this.dimensions)) {
+                    collisionMap.set(globalCoord, value);
                 }
             }
         });
@@ -47,13 +46,11 @@ export class MapManager {
         const speedMap = new Array2D(1.0);
 
         this.entities.forEach(entity => {
-            const entitySpeed = entity.speedFactor || 1.0;
+            const entitySpeed = entity.speedFactor;
             for (const coord of entity.dimensions.traverse()) {
-                const global = entity.tile.add(coord);
-                if (global.isInBound(CONSTS.ZERO, this.dimensions)) {
-                    if (entitySpeed > speedMap.get(global)) {
-                        speedMap.set(global, entitySpeed);
-                    }
+                const globalCoord = entity.tile.add(coord);
+                if (globalCoord.isInBound(CONSTS.ZERO, this.dimensions)) {
+                    speedMap.set(globalCoord, speedMap.get(globalCoord) * entitySpeed);
                 }
             }
         });

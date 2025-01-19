@@ -2,6 +2,7 @@ import { Entity } from "../engine/Entity.js";
 import {worldSpriteSheet} from "../sprites.js";
 import {TILE_SIZE} from "../constants.js";
 import {ctx} from "../engine/Canvas.js";
+import {Array2D} from "../engine/utils.js";
 
 export class Path extends Entity {
     constructor(tile, dimensions) {
@@ -10,14 +11,7 @@ export class Path extends Entity {
     }
 
     getCollisionMatrix() {
-        const matrix = [];
-        for (let row = 0; row < this.dimensions.y; row++) {
-            matrix[row] = [];
-            for (let col = 0; col < this.dimensions.y; col++) {
-                matrix[row][col] = false;
-            }
-        }
-        return matrix;
+        return new Array2D();
     }
 
     drawBackground() {

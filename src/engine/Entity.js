@@ -1,4 +1,5 @@
 import {ctx} from "./Canvas.js";
+import {Array2D} from "./utils.js";
 
 /**
  * Base class for any object/structure placed on the map.
@@ -21,12 +22,9 @@ export class Entity {
      * `false` for non-blocked cells, relative to the top-left corner of the entity.
      */
     getCollisionMatrix() {
-        const matrix = [];
-        for (let row = 0; row < this.dimensions.y; row++) {
-            matrix[row] = [];
-            for (let col = 0; col < this.dimensions.x; col++) {
-                matrix[row][col] = true;
-            }
+        const matrix = new Array2D();
+        for (const coord of this.dimensions.traverse()) {
+            matrix.set(coord, true);
         }
         return matrix;
     }

@@ -1,10 +1,10 @@
 import { Entity } from "../engine/Entity.js";
-import { Door } from "./Door.js";
 import { Coord } from "../engine/Coord.js";
 import {worldSpriteSheet} from "../sprites.js";
 import {TILE_SIZE} from "../constants.js";
 import {Portal} from "./Portal.js";
 import {ctx} from "../engine/Canvas.js";
+import {Array2D} from "../engine/utils.js";
 
 /**
  * A House occupies a rectangular footprint in tiles (width × height).
@@ -30,7 +30,7 @@ export class House extends Entity {
                 doorTile,
                 zoneKey,
                 spawn,
-                null,
+                false,
             )
         })
         this.baseSpritePosition = new Coord(0, 67);
@@ -40,20 +40,15 @@ export class House extends Entity {
      * By default, block the entire house footprint except the door tile.
      */
     getCollisionMatrix() {
-        const matrix = [];
-        for (let row = 0; row < this.dimensions.y; row++) {
-            matrix[row] = [];
-            for (let col = 0; col < this.dimensions.x; col++) {
-                matrix[row][col] = !(this.doorOffsets.some(door => col === door.x && row === door.y));
-            }
+        const matrix = new Array2D(false);
+
+        for (const coord of this.dimensions.traverse()) {
+            matrix.set(coord, !(this.doorOffsets.some(door => coord.isEqual(door))));
         }
+
         return matrix;
     }
 
-    /**
-     * The house "owns" the door.
-     * We expose it (or them, if multiple doors) via a method.
-     */
     getSubEntities() {
         return [...this.doorPortals];
     }
@@ -81,8 +76,8 @@ export class BigGreenHouse extends House {
 
     getCollisionMatrix() {
         const matrix = super.getCollisionMatrix();
-        matrix[4][4] = false;
-        matrix[3][4] = false;
+        matrix.set(new Coord(4, 4), false);
+        matrix.set(new Coord(4, 3), false);
         return matrix;
     }
 }

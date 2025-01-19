@@ -1,5 +1,6 @@
 import { Entity } from "../engine/Entity.js";
-import {CONSTS, Coord} from "../engine/Coord.js";
+import {CONSTS} from "../engine/Coord.js";
+import {Array2D} from "../engine/utils.js";
 
 export class Portal extends Entity {
     constructor(
@@ -15,6 +16,8 @@ export class Portal extends Entity {
     }
 
     getCollisionMatrix() {
-        return [[this.blocked]];
+        const matrix = new Array2D();
+        matrix.set(CONSTS.ZERO, this.blocked);
+        return matrix;
     }
 }

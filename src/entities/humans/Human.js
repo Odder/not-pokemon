@@ -4,6 +4,8 @@ import {npcSpriteSheet, pokemonNpcSpriteSheet} from "../../sprites.js";
 import {TILE_SIZE} from "../../constants.js";
 import {dialogue} from "../../huds/Dialogue.js";
 import {ctx} from "../../engine/Canvas.js";
+import {Array2D} from "../../engine/utils.js";
+
 
 /**
  * Represents a rectangular patch of grass, non-blocking.
@@ -24,7 +26,9 @@ export class Human extends Entity {
      * All false => no collision in any tile of this grass patch.
      */
     getCollisionMatrix() {
-        return [[true]];
+        const matrix = new Array2D();
+        matrix.set(CONSTS.ZERO, true);
+        return matrix;
     }
 }
 

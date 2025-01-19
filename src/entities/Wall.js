@@ -71,3 +71,9 @@ export class BoulderWall extends Wall {
         }
     }
 }
+
+export class Boulder extends Entity {
+    drawBackground() {
+        worldSpriteSheet.draw(ctx.background, (this.tile.x) * TILE_SIZE, (this.tile.y) * TILE_SIZE, 3, 0);
+    }
+}
