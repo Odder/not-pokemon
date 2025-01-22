@@ -17,7 +17,7 @@ const house1 = [
             .getEntities()
     ),
     new WoodenFloor(new Coord(1, 1), new Coord(10, 5)), // floor
-    new Portal(new Coord(7, 6), "palletTown", new Coord(6, 58), "#934e4e", false) // door out
+    new Portal(new Coord(7, 6), "palletTown", new Coord(11, 57), "#934e4e", false) // door out
 ]
 
 /** HOUSE 2 **/
@@ -31,7 +31,7 @@ const house2 = [
             .getEntities()
     ),
     new WoodenFloor(new Coord(21, 1), new Coord(10, 5)), // floor
-    new Portal(new Coord(27, 6), "palletTown", new Coord(15, 58), "#934e4e", false) // door out
+    new Portal(new Coord(27, 6), "palletTown", new Coord(19, 57), "#934e4e", false) // door out
 ]
 /** HOUSE 3 **/
 const house3 = [ // Professor Oak!
@@ -51,7 +51,7 @@ const house3 = [ // Professor Oak!
     new Squirtle(new Coord(50, 3)),
     new Bulbasaur(new Coord(51, 3)),
 
-    new Portal(new Coord(47, 16), "palletTown", new Coord(12, 65), "#934e4e", false) // door out
+    new Portal(new Coord(47, 16), "palletTown", new Coord(17, 64), "#934e4e", false) // door out
 ]
 
 export const palletHouses =  new Zone("Pallet Town Houses",

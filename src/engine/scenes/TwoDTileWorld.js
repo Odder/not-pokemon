@@ -32,7 +32,7 @@ export class TwoDTileWorld extends Scene {
                 canvas.foreground.style.transition = "all 0.4s ease-in-out";
 
             },
-            100
+            400
         );
     }
 

@@ -29,7 +29,6 @@ export class Grass extends Entity {
                 worldSpriteSheet.draw(ctx.background, (this.tile.x + col) * TILE_SIZE, (this.tile.y + row) * TILE_SIZE, 1, 5);
             }
         }
-        console.log('drawing grass')
     }
 
     onWalk() {

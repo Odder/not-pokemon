@@ -1,8 +1,9 @@
 import { Entity } from "../engine/Entity.js";
-import {Coord} from "../engine/Coord.js";
+import {CONSTS, Coord} from "../engine/Coord.js";
 import {worldSpriteSheet} from "../sprites.js";
 import {TILE_SIZE} from "../constants.js";
 import {ctx} from "../engine/Canvas.js";
+import {Array2D} from "../engine/utils.js";
 
 /**
  * Represents a wall entity in the game world. This class extends the functionality of the base Entity class and is used to create wall objects with specified dimensions and color.
@@ -73,7 +74,22 @@ export class BoulderWall extends Wall {
 }
 
 export class Boulder extends Entity {
+    constructor() {
+        super(CONSTS.ZERO, CONSTS.ONE);
+        this.tiles = new Array2D(false);
+    }
+
+    getCollisionMatrix() {
+        return this.tiles;
+    }
+
+    add(tile) {
+        this.tiles.set(tile, true);
+    }
+
     drawBackground() {
-        worldSpriteSheet.draw(ctx.background, (this.tile.x) * TILE_SIZE, (this.tile.y) * TILE_SIZE, 3, 0);
+        for (const [tile, _] of this.tiles.traverse()) {
+            worldSpriteSheet.draw(ctx.background, (tile.x) * TILE_SIZE, (tile.y) * TILE_SIZE, 3, 0);
+        }
     }
 }

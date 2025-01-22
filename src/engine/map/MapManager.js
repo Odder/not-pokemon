@@ -92,7 +92,7 @@ export class MapManager {
         this.entities.forEach((entity) => {
             if (entity.hasOnWalk) {
                 for (const tile of entity.dimensions.traverse()) {
-                    onWalkMap.set(tile, entity);
+                    onWalkMap.set(entity.tile.add(tile), entity);
                 }
             }
         });

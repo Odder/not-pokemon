@@ -1,9 +1,9 @@
 import { MapManager } from "./MapManager.js";
-import {CONSTS, Coord} from "../Coord.js";
+import {CONSTS as consts, CONSTS, Coord} from "../Coord.js";
 import {LowGrass} from "../../entities/LowGrass.js";
 import {Boulder} from "../../entities/Wall.js";
 import {SmallTree, Tree} from "../../entities/Tree.js";
-import {Path} from "../../entities/Path.js";
+import {PathFree} from "../../entities/Path.js";
 
 /**
  * A Zone wraps together:
@@ -21,7 +21,6 @@ export class Zone {
             this.loadFromLayout(layout);
         }
         this.mapManager = new MapManager(this.entities, dimensions);
-        console.info('entities of ', this.name, this.entities.length);
     }
 
     refresh() {
@@ -29,9 +28,10 @@ export class Zone {
     }
 
     loadFromLayout(layout) {
-        console.info('Loading form layout');
         const entities = [new LowGrass(CONSTS.ZERO, this.dimensions)];
         layout = layout.split('\n')
+        const boulders = new Boulder();
+        const paths = new PathFree();
 
         for (let y = 1; y < layout.length; y++) {
             for (let x = 0; x < layout[y].length; x++) {
@@ -41,12 +41,10 @@ export class Zone {
                     case '.':
                         continue;
                     case '-':
-                        //console.info('adding wall tile @ ', coord);
-                        entities.push(new Path(coord, CONSTS.ONE));
+                        paths.add(coord);
                         break;
                     case 'o':
-                        //console.info('adding wall tile @ ', coord);
-                        entities.push(new Boulder(coord, CONSTS.ONE));
+                        boulders.add(coord);
                         break;
                     case 'T':
                         entities.push(new Tree(coord, CONSTS.ONE));
@@ -55,13 +53,12 @@ export class Zone {
                         entities.push(new SmallTree(coord, CONSTS.ONE));
                         break;
                     case 'X':
-                        //console.info('adding spawn tile @ ', coord);
                         this.spawnTile = coord;
                         break;
                 }
             }
         }
 
-        this.entities = [...entities, ...this.entities];
+        this.entities = [...entities, boulders, paths, ...this.entities];
     }
 }
